@@ -15,7 +15,7 @@
 > `OpenGL ES 1.0` 和`1.1`：`Android 1.0`和更高版本支持这个`API`规范；  
 > `OpenGL ES 2.0` ：`Android 2.2(API 8)`和更高版本支持这个`API`规范；  
 > `OpenGL ES 3.0` ：`Android 4.3(API 18)`和更高版本支持这个`API`规范；  
-> `OpenGL ES 3.1` ：`Android 5.0(API 21)`和更高版本支持这个`API`规范`。  
+> `OpenGL ES 3.1` ：`Android 5.0(API 21)`和更高版本支持这个`API`规范。  
 
 `OpenGL`需要由设备制造商提供实现支持，目前广泛支持的是2.0 。`Android`需要在`AndroidManifest.xml`文件中添加如下配置：  
 
@@ -124,7 +124,7 @@
     [The OpenGL ES Shading Language-基础篇](https://www.jianshu.com/p/f1a86ac46b4d)  
     [The OpenGL ES Shading Language-变量与类型篇](https://www.jianshu.com/p/86285678d2c1)    
   
-* 插件：
+* 插件：  
 	本文使用了`GLSL Support`插件，如果在插件市场搜索不到的话，可以考虑使用`resources`目录下的`GLSL4idea.jar`；同时该目录下的`PDF`文件也可作为学习资料。
 
 ## 二、`OpenGL SL` 实现相机预览
@@ -135,3 +135,18 @@
 
 ## 三、离屏渲染
 
+1，上节课代码整理
+
+2，FBO实现离屏渲染
+
+3，1行代码实现黑白相机   
+
+
+
+Frame Buffer Object 
+
+屏幕显示画面的**映像**
+
+1个存储单元对应屏幕上1个像素，整个帧缓冲对应1帧图像
+
+> FBO 资料：https://www.jianshu.com/p/8243b517e96a
