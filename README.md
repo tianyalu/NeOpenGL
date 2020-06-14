@@ -12,10 +12,10 @@
 
 `Android OpenGL ES` 是针对手机、`PDA`和游戏主机等嵌入式设备设计的`OpenGL API`子集。 
 
-> `OpenGL ES 1.0` 和`1.1`：`Android 1.0`和更高版本支持这个`API`规范；
-> `OpenGL ES 2.0` ：`Android 2.2(API 8)`和更高版本支持这个`API`规范；
-> `OpenGL ES 3.0` ：`Android 4.3(API 18)`和更高版本支持这个`API`规范；
-> `OpenGL ES 3.1` ：`Android 5.0(API 21)`和更高版本支持这个`API`规范`。
+> `OpenGL ES 1.0` 和`1.1`：`Android 1.0`和更高版本支持这个`API`规范；  
+> `OpenGL ES 2.0` ：`Android 2.2(API 8)`和更高版本支持这个`API`规范；  
+> `OpenGL ES 3.0` ：`Android 4.3(API 18)`和更高版本支持这个`API`规范；  
+> `OpenGL ES 3.1` ：`Android 5.0(API 21)`和更高版本支持这个`API`规范`。  
 
 `OpenGL`需要由设备制造商提供实现支持，目前广泛支持的是2.0 。`Android`需要在`AndroidManifest.xml`文件中添加如下配置：  
 
@@ -25,10 +25,10 @@
 #### 1.1.1 `GLSurfaceView`
 
 > 继承至`SurfaceView`，它内嵌的`surface`专门负责`OpenGL`渲染；  
-> 管理`Surface`与`EGL`；
-> 允许自定义渲染器（`render`）；
-> 让渲染器在独立的线程里工作，和`UI`线程分离；
-> 支持按需渲染（`on-demand`）和连续渲染（`continuous`）。
+> 管理`Surface`与`EGL`；  
+> 允许自定义渲染器（`render`）；  
+> 让渲染器在独立的线程里工作，和`UI`线程分离；  
+> 支持按需渲染（`on-demand`）和连续渲染（`continuous`）。  
 
 #### 1.1.2 `EGL`
 
@@ -46,7 +46,7 @@
 
 #### 1.4.1 `OpenGL`世界坐标系
 
-![image](https://github.com/tianyalu/NeOpenGL/raw/master/show/opengl_world_coordinate_sytstem.png)   
+![image](https://github.com/tianyalu/NeOpenGL/raw/master/show/opengl_world_coordinate_system.png)   
 
 #### 1.4.2 `OpenGL`纹理坐标系
 
@@ -60,7 +60,7 @@
 
 着色器（`Shader`）是运行在GPU上的小程序。
 
-* 顶点着色器（`vertex shader`）：如何处理顶点、法线等数据的小程序；
+* 顶点着色器（`vertex shader`）：如何处理顶点、法线等数据的小程序；  
 
 * 片元着色器（`fragment shader`）：如何处理光、阴影、遮挡、环境等等对物体表面的影响，最终生成一副图像的小程序。  
 
@@ -120,9 +120,9 @@
 
 * 本文参考：  
   
-	  [OpenGL](https://www.jianshu.com/p/c4dda6884655)
-    [The OpenGL ES Shading Language-基础篇](https://www.jianshu.com/p/f1a86ac46b4d)
-    [The OpenGL ES Shading Language-变量与类型篇](https://www.jianshu.com/p/86285678d2c1)  
+	  [OpenGL](https://www.jianshu.com/p/c4dda6884655)  
+    [The OpenGL ES Shading Language-基础篇](https://www.jianshu.com/p/f1a86ac46b4d)  
+    [The OpenGL ES Shading Language-变量与类型篇](https://www.jianshu.com/p/86285678d2c1)    
   
 * 插件：
 	本文使用了`GLSL Support`插件，如果在插件市场搜索不到的话，可以考虑使用`resources`目录下的`GLSL4idea.jar`；同时该目录下的`PDF`文件也可作为学习资料。
