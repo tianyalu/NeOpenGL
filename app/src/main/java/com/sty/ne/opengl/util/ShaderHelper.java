@@ -64,7 +64,7 @@ public class ShaderHelper {
      * @param shaderCode 片元着色器代码
      * @return 片元着色器ID（返回0表示失败）
      */
-    public int compileFragmentShader(String shaderCode) {
+    public static int compileFragmentShader(String shaderCode) {
         return compileShader(GL_FRAGMENT_SHADER, shaderCode);
     }
 

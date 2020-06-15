@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.sty.ne.opengl.filter.CameraFilter;
 import com.sty.ne.opengl.filter.ScreenFilter;
 import com.sty.ne.opengl.util.CameraHelper;
 
@@ -18,6 +19,7 @@ class MyGLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvaila
     private MyGLSurfaceView myGLSurfaceView;
     private int[] mTextureID;
     private SurfaceTexture mSurfaceTexture;
+    private CameraFilter mCameraFilter;
     private ScreenFilter mScreenFilter;
     private float[] mtx = new float[16];
 
@@ -41,18 +43,20 @@ class MyGLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvaila
         mSurfaceTexture = new SurfaceTexture(mTextureID[0]);
         mSurfaceTexture.setOnFrameAvailableListener(this);
 
+        mCameraFilter = new CameraFilter(myGLSurfaceView.getContext());
         mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext());
     }
 
     /**
      * Surface 发生改变时回调
      * @param gl10 1.0 api预留参数
-     * @param i
-     * @param i1
+     * @param width
+     * @param height
      */
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
         mCameraHelper.startPreview(mSurfaceTexture);
+        mCameraFilter.onReady(width, height);
         mScreenFilter.onReady(width, height);
     }
 
@@ -69,8 +73,18 @@ class MyGLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvaila
 
         //绘制相机图像数据
         mSurfaceTexture.updateTexImage();
+
         mSurfaceTexture.getTransformMatrix(mtx);
-        mScreenFilter.onDrawFrame(mTextureID[0], mtx);
+        mCameraFilter.setMatrix(mtx);
+        //mTextureID[0]: 摄像头的纹理
+        int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);//渲染到FBO
+        //textureId: FBO的纹理
+        //...加滤镜
+        //int aTextureId = aaaFilter.onDrawFrame(textureId);//渲染到FBO
+        //int bTextureId = bbbFilter.onDrawFrame(aTextureId);//渲染到FBO
+        //int cTextureId = cccFilter.onDrawFrame(bTextureId);//渲染到FBO
+        //...
+        mScreenFilter.onDrawFrame(textureId); //渲染到屏幕 textureId : cTextureId
     }
 
     /**
@@ -80,5 +94,9 @@ class MyGLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvaila
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         myGLSurfaceView.requestRender();
+    }
+
+    public void surfaceDestroyed() {
+        mCameraHelper.stopPreview();
     }
 }
