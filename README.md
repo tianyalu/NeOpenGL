@@ -118,9 +118,9 @@
 
   ​    [https://learnopengl.com/](https://learnopengl.com/)
 
-* 本文参考：  
+* 本文参考：    
   
-	  [OpenGL](https://www.jianshu.com/p/c4dda6884655)  
+    [OpenGL](https://www.jianshu.com/p/c4dda6884655)  
     [The OpenGL ES Shading Language-基础篇](https://www.jianshu.com/p/f1a86ac46b4d)  
     [The OpenGL ES Shading Language-变量与类型篇](https://www.jianshu.com/p/86285678d2c1)    
   
@@ -135,8 +135,6 @@
 
 ## 三、离屏渲染
 
-1，上节课代码整理
-
 2，FBO实现离屏渲染
 
 3，1行代码实现黑白相机   
@@ -149,4 +147,7 @@ Frame Buffer Object
 
 1个存储单元对应屏幕上1个像素，整个帧缓冲对应1帧图像
 
-> FBO 资料：https://www.jianshu.com/p/8243b517e96a
+> FBO 资料：[FBO 帧缓存对象](https://www.jianshu.com/p/8243b517e96a)  
+> 
+
+[OpenGL 纹理篇](https://www.jianshu.com/p/1b0ecbd671ff)

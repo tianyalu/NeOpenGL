@@ -1,10 +1,10 @@
 package com.sty.ne.opengl.util;
 
 import static android.opengl.GLES20.*;
-
+//参考：
 public class TextureHelper {
     /**
-     * 生成配置纹理
+     * 生成并配置纹理
      * @param textures
      */
     public static void genTextures(int[] textures) {
