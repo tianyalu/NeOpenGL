@@ -8,7 +8,7 @@ import com.sty.ne.opengl.util.TextureHelper;
 import static android.opengl.GLES20.*;
 
 /**
- * 不需要渲染到屏幕（而是写入到发BO缓冲中）
+ * 不需要渲染到屏幕（而是写入到FBO缓冲中）
  */
 public class CameraFilter extends BaseFilter {
 
@@ -92,7 +92,7 @@ public class CameraFilter extends BaseFilter {
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        //return textureId; //注意这里,不能反悔摄像头的纹理id，而是返回与 FBO 绑定了的纹理id
+        //return textureId; //注意这里,不能反回摄像头的纹理id，而是返回与 FBO 绑定了的纹理id
         return mFrameBufferTextures[0];
     }
 

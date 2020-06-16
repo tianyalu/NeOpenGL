@@ -129,25 +129,47 @@
 
 ## 二、`OpenGL SL` 实现相机预览
 
-
+代码在 `camera_preview` 分支。
 
 
 
 ## 三、离屏渲染
 
-2，FBO实现离屏渲染
+代码在 `master` 分支。
 
-3，1行代码实现黑白相机   
+离屏渲染主要依赖`FBO`实现。
 
+`FBO（Frame Buffer Object）`：帧缓冲对象（1个存储单元对应屏幕上1个像素，整个帧缓冲对应1帧图像）。默认情况下，我们在`GLSurfaceView`中绘制的结果是直接显示到屏幕上的，然而实际中有很多情况并不需要渲染到屏幕上，这时候使用`FBO`就可以很方便地实现这类需求。`FBO`可以让我们的渲染不直接渲染到屏幕上，而是渲染到离屏Buffer中。
 
+### 3.1 思路
 
-Frame Buffer Object 
+前面我们创建了一个`ScreenFilter`类用来封装将摄像头数据显示到屏幕上，然而我们需要在显示之前增加各种“效果”，如果我们只存在一个`ScreenFilter`，那么所有的“效果”都会积压在这个类中，同时也需要大量的`if else`来判断是否开启“效果”。
+
+我们可以将每种“效果”写到单独的一个`Filter`中去，并且在`ScreenFilter`之前的所有`Filter`都不需要显示到屏幕中，所以在`ScreenFilter`之前都将其使用`FBO`进行缓存。
+
+![image](https://github.com/tianyalu/NeOpenGL/raw/master/show/fbo_structure.png)   
+
+### 3.2 注意事项
+
+摄像头画面经过`FBO`的缓存的时候，我们再从`FBO`绘制到屏幕，这时候就不需要在使用`samplerExternalOES`了。这也意味着`ScreenFilter`使用的采样器就是正常的`sample2D`，也不需要`#extension GL_OES_EGL_image_external : require`。
+
+然而在最原始的状态下是没有开启任何效果的，所有`ScreenFilter`就比较尴尬：
+
+> 开启效果：使用`sample2D`
+> 未开启效果：使用`sampleExternalOES`
+
+那么就需要在`ScreenFilter`中使用`if else`来进行判断，但比较麻烦，这里我们采用如下方式：
+> 从摄像头使用的纹理首先绘制到`CameraFilter`的`FBO`中，这样无论是否开启效果，`ScreenFilter`都是以`sample2D`来进行采用的了。
+
+### 3.3 参考资料
+
+本文参考：  
+
+[FBO 帧缓存对象](https://www.jianshu.com/p/8243b517e96a)  
+
+[OpenGL 纹理篇](https://www.jianshu.com/p/1b0ecbd671ff)
 
 屏幕显示画面的**映像**
 
-1个存储单元对应屏幕上1个像素，整个帧缓冲对应1帧图像
 
-> FBO 资料：[FBO 帧缓存对象](https://www.jianshu.com/p/8243b517e96a)  
-> 
 
-[OpenGL 纹理篇](https://www.jianshu.com/p/1b0ecbd671ff)
