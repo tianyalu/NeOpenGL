@@ -84,15 +84,16 @@ public class ScreenFilter {
         glDeleteShader(vShaderId);
         glDeleteShader(fShaderId);
 
-        //通过变量索引给变量赋值
-        //获取变量的索引
+        /**
+         * 5. 通过变量索引给变量赋值
+         */
+        //5.1 获取变量的索引
         vPosition = glGetAttribLocation(mProgramId, "vPosition");
         vCoord = glGetAttribLocation(mProgramId, "vCoord");
         vMatrix = glGetUniformLocation(mProgramId, "vMatrix");
         vTexture = glGetUniformLocation(mProgramId, "vTexture");
 
-        //顶点坐标
-        //缓冲区内存分配
+        //5.2 顶点坐标 缓冲区内存分配
         mVertexBuffer = ByteBuffer.allocateDirect(4*2*4) //坐标数 * 数据类型 * 占字节数
                 .order(ByteOrder.nativeOrder()) //使用本地字节序
                 .asFloatBuffer();
@@ -105,9 +106,10 @@ public class ScreenFilter {
                 -1.0f, 1.0f, //左上
                 1.0f, 1.0f   //右上
         };
+        //5.3 顶点坐标赋值
         mVertexBuffer.put(v);
 
-        //纹理坐标
+        //5.4 纹理坐标 缓冲区内存分配
         mTextureBuffer = ByteBuffer.allocateDirect(4*2*4) //坐标数 * 数据类型 * 占字节数
                 .order(ByteOrder.nativeOrder()) //使用本地字节序
                 .asFloatBuffer();
@@ -126,6 +128,7 @@ public class ScreenFilter {
                 0.0f, 1.0f, //左上
                 1.0f, 1.0f  //右上
         };
+        //5.5 纹理坐标赋值
         mTextureBuffer.put(t);
     }
 

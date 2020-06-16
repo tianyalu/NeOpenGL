@@ -47,8 +47,8 @@ class MyGLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvaila
     /**
      * Surface 发生改变时回调
      * @param gl10 1.0 api预留参数
-     * @param i
-     * @param i1
+     * @param width
+     * @param height
      */
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
@@ -79,6 +79,6 @@ class MyGLRender implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvaila
      */
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        myGLSurfaceView.requestRender();
+        myGLSurfaceView.requestRender(); //请求渲染
     }
 }
