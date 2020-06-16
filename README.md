@@ -22,6 +22,7 @@
 ```xml
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 ```
+
 #### 1.1.1 `GLSurfaceView`
 
 > 继承至`SurfaceView`，它内嵌的`surface`专门负责`OpenGL`渲染；  
@@ -65,6 +66,7 @@
 * 片元着色器（`fragment shader`）：如何处理光、阴影、遮挡、环境等等对物体表面的影响，最终生成一副图像的小程序。  
 
 ### 1.6 `GLSL`
+
 `OpenGL`：着色语言（`OpenGL Shading Language`）。
 ![image](https://github.com/tianyalu/NeOpenGL/raw/master/show/glsl.png)   
 
@@ -119,23 +121,173 @@
   ​    [https://learnopengl.com/](https://learnopengl.com/)
 
 * 本文参考：    
-  
-    [OpenGL](https://www.jianshu.com/p/c4dda6884655)  
-    [The OpenGL ES Shading Language-基础篇](https://www.jianshu.com/p/f1a86ac46b4d)  
-    [The OpenGL ES Shading Language-变量与类型篇](https://www.jianshu.com/p/86285678d2c1)    
-  
+
+  [OpenGL](https://www.jianshu.com/p/c4dda6884655)  
+  [The OpenGL ES Shading Language-基础篇](https://www.jianshu.com/p/f1a86ac46b4d)  
+  [The OpenGL ES Shading Language-变量与类型篇](https://www.jianshu.com/p/86285678d2c1)    
+
 * 插件：  
-	本文使用了`GLSL Support`插件，如果在插件市场搜索不到的话，可以考虑使用`resources`目录下的`GLSL4idea.jar`；同时该目录下的`PDF`文件也可作为学习资料。
+  本文使用了`GLSL Support`插件，如果在插件市场搜索不到的话，可以考虑使用`resources`目录下的`GLSL4idea.jar`；同时该目录下的`PDF`文件也可作为学习资料。
 
 ## 二、`OpenGL SL` 实现相机预览
 
-代码在 `camera_preview` 分支。
+> 代码在 `camera_preview` 分支。
 
+### 2.1 总体实现思路
 
+核心点在于`GLSurfaceView`初始化时为其设置自定义的渲染器`MyGLRender`,该渲染器实现了`GLSurfaceView.Renderer`和`SurfaceTexture.OnFrameAvailableListener`接口，主要工作都是在这些接口中的实现方法中实现的：
+
+> 1. `onSurfaceCreated()`：`Surface`创建时，初始化`CameraHelper`，准备纹理画布，设置画布可用监听器，初始化`ScreenFilter`；
+> 2. `onSurfaceChanged()`：`Surface`改变时，`CameraHelper`设置纹理画布，并开始预览，`ScreenFilter`调用`onReady(w,h)`方法传入宽高；
+> 3. `onDrawFrame()`：绘制时，清屏，纹理画布更新，获取变换矩阵，调用`ScreenFilter`的`onDrawFrame()`方法绘制；
+> 4. `onFrameAvailable()`：纹理画布可用时，调用`GLSurfaceView.requestRender()`方法请求渲染。
+
+### 2.2 详细步骤
+
+#### 2.2.1 `Surface`创建时
+
+```java
+/**
+ * Surface创建时回调
+ * @param gl10 1.0 api预留参数
+ * @param eglConfig
+ */
+@Override
+public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
+  mCameraHelper = new CameraHelper((Activity) myGLSurfaceView.getContext());
+  //准备画布
+  mTextureID = new int[1];
+  //第三个参数表示你要使用mTextureID数组中那个ID的索引
+  glGenTextures(mTextureID.length, mTextureID, 0);
+
+  mSurfaceTexture = new SurfaceTexture(mTextureID[0]);
+  mSurfaceTexture.setOnFrameAvailableListener(this);
+
+  mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext());
+}
+```
+
+`ScreenFilter`初始化步骤：
+
+> 1. 在`app/src/main/res/raw/`目录下编写顶点着色器和片元着色器源码文件；
+> 2. 从顶点着色器和片元着色器源码文件中读取源码变成`String`类型；
+> 3. 配置顶点着色器；  
+>    a. 创建顶点着色器；  
+>    b. 绑定顶点着色器源码到着色器；  
+>    c. 编译着色器代码；  
+>    d. 判断编译是否成功；  
+> 4. 配置顶点着色器；  
+>    a. 创建片元着色器；  
+>    b. 绑定片元着色器源码到着色器；   
+>    c. 编译着色器代码；   
+>    d. 判断编译是否成功；     
+> 5. 创建`OpenGL`程序；
+> 6. 将创建的顶点和片元着色器附加到该程序上；
+> 7. 链接着色器；
+> 8. 判断链接是否成功；
+> 9. 释放、删除着色器;
+> 10. 通过变量索引给变量赋值；  
+>     a. 获取变量的索引；  
+>     b. 顶点坐标 缓冲区内存分配；  
+>     c. 顶点坐标赋值；  
+>     d. 纹理坐标 缓冲区内存分配；  
+>     e. 纹理坐标赋值 。 
+
+#### 2.2.2 `Surface`改变时
+
+```java
+/**
+ * Surface 发生改变时回调
+ * @param gl10 1.0 api预留参数
+ * @param width
+ * @param height
+ */
+@Override
+public void onSurfaceChanged(GL10 gl10, int width, int height) {
+  mCameraHelper.startPreview(mSurfaceTexture);
+  mScreenFilter.onReady(width, height);
+}
+```
+
+摄像头预览时主要是设置纹理来实现离屏渲染：
+
+```java
+//离屏渲染
+mCamera.setPreviewTexture(surfaceTexture);
+```
+
+#### 2.2.3 绘制时
+
+```java
+/**
+ * 绘制一帧图像时回调
+ * 注意：该方法中必须进行绘制操作
+ * （返回后，交换渲染缓冲区，如果不绘制，会导致闪屏）
+ * @param gl10 1.0 api预留参数
+ */
+@Override
+public void onDrawFrame(GL10 gl10) {
+  glClearColor(255, 0, 0, 0); //设置清屏颜色
+  glClear(GL_COLOR_BUFFER_BIT); //颜色缓冲区
+
+  //绘制相机图像数据
+  mSurfaceTexture.updateTexImage();
+  mSurfaceTexture.getTransformMatrix(mtx);
+  mScreenFilter.onDrawFrame(mTextureID[0], mtx);
+}
+```
+
+`ScreenFilter`绘制：
+
+```java
+public void onDrawFrame(int textureId, float[] mtx) {
+  glViewport(0, 0, mWidth, mHeight); //设置视窗大小
+  glUseProgram(mProgramId);
+  //画画
+  //顶点坐标赋值
+  mVertexBuffer.position(0);
+  //传值
+  glVertexAttribPointer(vPosition, 2, GL_FLOAT, false, 0, mVertexBuffer);
+  //激活
+  glEnableVertexAttribArray(vPosition);
+
+  //纹理坐标
+  mTextureBuffer.position(0);
+  glVertexAttribPointer(vCoord, 2, GL_FLOAT, false, 0, mTextureBuffer);
+  glEnableVertexAttribArray(vCoord);
+
+  //变换矩阵
+  glUniformMatrix4fv(vMatrix, 1, false, mtx, 0);
+
+  //vTexture
+  //激活图层
+  glActiveTexture(GL_TEXTURE0);
+  //绑定纹理
+  //glBindTexture(GL_TEXTURE_2D);
+  glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
+  glUniform1i(vTexture, 0);
+
+  //通知OpenGL绘制
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+```
+
+#### 2.2.4 纹理画布可用时
+
+```java
+/**
+ * 画布有有效数据时回调
+ * @param surfaceTexture
+ */
+@Override
+public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+  myGLSurfaceView.requestRender(); //请求渲染
+}
+```
 
 ## 三、离屏渲染
 
-代码在 `master` 分支。
+> 代码在 `master` 分支。
 
 离屏渲染主要依赖`FBO`实现。
 
@@ -159,6 +311,7 @@
 > 未开启效果：使用`sampleExternalOES`
 
 那么就需要在`ScreenFilter`中使用`if else`来进行判断，但比较麻烦，这里我们采用如下方式：
+
 > 从摄像头使用的纹理首先绘制到`CameraFilter`的`FBO`中，这样无论是否开启效果，`ScreenFilter`都是以`sample2D`来进行采用的了。
 
 ### 3.3 参考资料
@@ -168,8 +321,4 @@
 [FBO 帧缓存对象](https://www.jianshu.com/p/8243b517e96a)  
 
 [OpenGL 纹理篇](https://www.jianshu.com/p/1b0ecbd671ff)
-
-屏幕显示画面的**映像**
-
-
 
