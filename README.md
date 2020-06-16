@@ -176,7 +176,7 @@ public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 		b. 绑定顶点着色器源码到着色器；  
 		c. 编译着色器代码；  
 		d. 判断编译是否成功；  
-> 3. 配置顶点着色器；
+> 3. 配置顶点着色器；  
 		a. 创建片元着色器；  
 		b. 绑定片元着色器源码到着色器；   
 		c. 编译着色器代码；   
@@ -186,7 +186,7 @@ public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 > 6. 链接着色器；
 > 7. 判断链接是否成功；
 > 8. 释放、删除着色器;
-> 9. 通过变量索引给变量赋值；
+> 9. 通过变量索引给变量赋值；  
 		a. 获取变量的索引；  
 		b. 顶点坐标 缓冲区内存分配；  
 		c. 顶点坐标赋值；  
