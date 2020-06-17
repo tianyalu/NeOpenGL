@@ -58,20 +58,24 @@ public class BaseFilter {
     }
 
     private void init(Context context) {
+        //获取顶点着色器代码字符串
         String vertexSource = TextResourceReader.readTextFileFromResource(context,
                 mVertexSourceId);  //顶点着色器源码
+        //获取片元着色器代码字符串
         String fragmentSource = TextResourceReader.readTextFileFromResource(context,
                 mFragmentSourceId);  //片元着色器源码
-
+        //编译并获取顶点着色器id
         int vertexShaderId = ShaderHelper.compileVertexShader(vertexSource);
+        //编译并获取片元着色器id
         int fragmentShaderId = ShaderHelper.compileFragmentShader(fragmentSource);
-
+        //将顶点着色器和片元着色器链接到程序
         mProgramId = ShaderHelper.linkProgram(vertexShaderId, fragmentShaderId);
 
         //通过变量索引给变量赋值
-        //获取变量的索引
+        //获取着色器代码中 Attribute 变量的索引值
         vPosition = glGetAttribLocation(mProgramId, "vPosition");
         vCoord = glGetAttribLocation(mProgramId, "vCoord");
+        //获取着色器代码中Uniform 变量的索引值
         vMatrix = glGetUniformLocation(mProgramId, "vMatrix");
         vTexture = glGetUniformLocation(mProgramId, "vTexture");
     }
@@ -94,6 +98,13 @@ public class BaseFilter {
 
         //纹理坐标
         mTextureBuffer.position(0);
+        //指定索引处的顶点属性数组的位置和数据格式，方便渲染时来使用
+        //index: 索引值
+        //size: 每个顶点属性的分量（组件数），必须是1、2、3或4（比如顶点vec2(x,y), vec3(x,y,z), 颜色vec4(r,g,b,a））
+        //type: 数据类型
+        //normalized: 是否需要归一化处理
+        //stride: 步长（0：数据是紧密排列的）
+        //Buffer: 缓冲区，告诉OpenGL到哪里去拿数据
         glVertexAttribPointer(vCoord, 2, GL_FLOAT, false, 0, mTextureBuffer);
         glEnableVertexAttribArray(vCoord);
 
