@@ -154,16 +154,17 @@
  */
 @Override
 public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-  mCameraHelper = new CameraHelper((Activity) myGLSurfaceView.getContext());
-  //准备画布
-  mTextureID = new int[1];
-  //第三个参数表示你要使用mTextureID数组中那个ID的索引
-  glGenTextures(mTextureID.length, mTextureID, 0);
+    mCameraHelper = new CameraHelper((Activity) myGLSurfaceView.getContext());
+    //准备画布
+    mTextureID = new int[1];
+    //第三个参数表示你要使用mTextureID数组中那个ID的索引
+    glGenTextures(mTextureID.length, mTextureID, 0);
 
-  mSurfaceTexture = new SurfaceTexture(mTextureID[0]);
-  mSurfaceTexture.setOnFrameAvailableListener(this);
+    mSurfaceTexture = new SurfaceTexture(mTextureID[0]);
+    mSurfaceTexture.setOnFrameAvailableListener(this);
 
-  mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext());
+    mCameraFilter = new CameraFilter(myGLSurfaceView.getContext());
+    mScreenFilter = new ScreenFilter(myGLSurfaceView.getContext());
 }
 ```
 
@@ -204,8 +205,9 @@ public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
  */
 @Override
 public void onSurfaceChanged(GL10 gl10, int width, int height) {
-  mCameraHelper.startPreview(mSurfaceTexture);
-  mScreenFilter.onReady(width, height);
+    mCameraHelper.startPreview(mSurfaceTexture);
+    mCameraFilter.onReady(width, height);
+    mScreenFilter.onReady(width, height);
 }
 ```
 
@@ -227,13 +229,23 @@ mCamera.setPreviewTexture(surfaceTexture);
  */
 @Override
 public void onDrawFrame(GL10 gl10) {
-  glClearColor(255, 0, 0, 0); //设置清屏颜色
-  glClear(GL_COLOR_BUFFER_BIT); //颜色缓冲区
+    glClearColor(255, 0, 0, 0); //设置清屏颜色
+    glClear(GL_COLOR_BUFFER_BIT); //颜色缓冲区
 
-  //绘制相机图像数据
-  mSurfaceTexture.updateTexImage();
-  mSurfaceTexture.getTransformMatrix(mtx);
-  mScreenFilter.onDrawFrame(mTextureID[0], mtx);
+    //绘制相机图像数据
+    mSurfaceTexture.updateTexImage();
+
+    mSurfaceTexture.getTransformMatrix(mtx);
+    mCameraFilter.setMatrix(mtx);
+    //mTextureID[0]: 摄像头的纹理
+    int textureId = mCameraFilter.onDrawFrame(mTextureID[0]);//渲染到FBO
+    //textureId: FBO的纹理
+    //...加滤镜
+    //int aTextureId = aaaFilter.onDrawFrame(textureId);//渲染到FBO
+    //int bTextureId = bbbFilter.onDrawFrame(aTextureId);//渲染到FBO
+    //int cTextureId = cccFilter.onDrawFrame(bTextureId);//渲染到FBO
+    //...
+    mScreenFilter.onDrawFrame(textureId); //渲染到屏幕 textureId : cTextureId
 }
 ```
 
